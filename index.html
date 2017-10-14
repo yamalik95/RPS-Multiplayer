@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>RPS</title>
+	<link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+	<script src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+	
+	<div id="gameStatusContainer">
+		<form id="userName">
+			Enter Username: <input id="userNameInput" type="text" name="UserName">
+			<input id="submitInput" type="submit" value="Submit">
+		</form>	
+		<div id="playersList">Players Waiting:</div>
+	</div>
+
+	<div id="gameContainer">
+		<div id="history">
+			<div id="gameCommentary">
+				<div id="round1Title">Round 1:</div>
+				<div class="leftUserCommentary" id="leftRound1">Waiting for </div>
+				<div class="rightUserCommentary" id="rightRound1">Waiting for </div>
+				<div id='resultRound1'></div>
+			</div>
+		</div>
+		<div class="user" id="leftUser">
+			<div id='leftUserText'>
+				USER:</br>
+			</div>
+			<div id='leftUserControl'>
+				<button class="gameBtn" id='leftRock'>Rock</button>
+				<button class="gameBtn" id='leftPaper'>Paper</button>
+				<button class="gameBtn" id='leftScissors'>Scissors</button>
+			</div>
+		</div>
+		<div class="user" id="rightUser">
+			<div id='rightUserText'>
+				USER:</br>
+			</div>
+			<div id='rightUserControl'>
+				<button class="gameBtn" id='rightRock'>Rock</button>
+				<button class="gameBtn" id='rightPaper'>Paper</button>
+				<button class="gameBtn" id='rightScissors'>Scissors</button>
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyC59vTho8kRI8nDxg5f0ogDbp8aPjdRa5c",
+		    authDomain: "rps-multiplayer-cc83d.firebaseapp.com",
+		    databaseURL: "https://rps-multiplayer-cc83d.firebaseio.com",
+		    projectId: "rps-multiplayer-cc83d",
+		    storageBucket: "rps-multiplayer-cc83d.appspot.com",
+		    messagingSenderId: "636094389527"
+		};
+		firebase.initializeApp(config);
+	</script>
+	<script src="./assets/javascript/game.js"></script>
+</body>
+</html>

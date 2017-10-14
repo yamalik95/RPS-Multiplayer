@@ -1,0 +1,49 @@
+#gameStatusContainer {
+	height: 100px;
+	width: 100%;
+	text-align: center;
+}
+
+#gameContainer {
+	height: 500px;
+	width: 800px;
+	background-color: lightgrey;
+	margin: auto;
+}
+
+#leftUser {
+	float: left;
+}
+
+.user {
+	float: right;
+	height: 500px;
+	width: 300px;
+	background-color: white;
+	text-align: center;
+	font-weight: bolder;
+	font-size: 20px;
+}
+
+#history {
+	position: absolute;
+	margin-left: 300px;
+	height: 500px;
+	width: 200px;
+	text-align: center;
+	overflow-y: auto;
+}
+
+#leftUserControl {
+	display: none;
+	margin-top: 50px;
+}
+
+#rightUserControl {
+	display: none;
+	margin-top: 50px;
+}
+
+#gameCommentary {
+	display: none;
+}
