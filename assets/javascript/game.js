@@ -8,7 +8,9 @@ var game = {
 	opponent: null,
 	round: 1,
 	choices: ['Rock','Paper','Scissors'],
-	ready: 0
+	ready: 0,
+	wins: 0,
+	oppWins: 0
 }
 
 var db = firebase.database()
@@ -49,7 +51,7 @@ db.ref('/signedOn').on('value', function(snapshot) {
 		db.ref('/users').limitToFirst(2).once('value', function(snapshot) {
 			var pointer = 0
 			$.each(snapshot.val(), function(key, value) {
-				$("#"+game.userSides[pointer]+"UserText").append(value.name)
+				$("#"+game.userSides[pointer]+"UserText").append(value.name+"</br></br>Total Wins: <div id='"+game.userSides[pointer]+"Wins'>0</div>")
 				pointer++
 				if (game.playerID === 1 && value.order === 0) {
 					game.opponent = value.name
@@ -99,7 +101,7 @@ $(".gameBtn").on('click', function() {
 db.ref('/rightChoice').on('value', function(snapshot) {
 	if (game.choices.indexOf(snapshot.val()) !== -1) {
 
-		$('#rightRound'+game.round).css('display', 'none')
+		$('#rightRound'+parseInt(Math.ceil(game.round))).css('display', 'none')
 		game.ready++
 	}
 	if (game.ready === 2) {
@@ -111,7 +113,7 @@ db.ref('/rightChoice').on('value', function(snapshot) {
 
 db.ref('/leftChoice').on('value', function(snapshot) {
 	if (game.choices.indexOf(snapshot.val()) !== -1) {
-		$('#leftRound'+game.round).css('display', 'none')
+		$('#leftRound'+parseInt(Math.ceil(game.round))).css('display', 'none')
 		game.ready++
 	}
 	if (game.ready === 2) {
@@ -144,13 +146,20 @@ var compare = function(leftChoice, rightChoice) {
 					result: winner+" wins round "+parseInt(game.round)
 				})
 			})
-			$('#leftRound'+game.round).css('display', 'block') 
-			$('#leftRound'+game.round).html(winner+" chose "+leftChoice)
-			$('#rightRound'+game.round).css('display', 'block')
-			$('#rightRound'+game.round).html(loser+" chose "+rightChoice)
+			$('#leftRound'+parseInt(game.round)).css('display', 'block') 
+			$('#leftRound'+parseInt(game.round)).html(winner+" chose "+leftChoice)
+			$('#rightRound'+parseInt(game.round)).css('display', 'block')
+			$('#rightRound'+parseInt(game.round)).html(loser+" chose "+rightChoice)
 			db.ref('/result').once('value', function(snapshot) {
 				$('#resultRound'+parseInt(game.round)).html(snapshot.val())
 			})
+			if (game.playerID === 1) {
+				game.wins++
+				$("#leftWins").html(game.wins)
+			} else {
+				game.oppWins++
+				$("#leftWins").html(game.oppWins)
+			}
 		})
 	} else if (dif === -1) {
 		db.ref('/users').once('value', function(snapshot) {
@@ -164,13 +173,20 @@ var compare = function(leftChoice, rightChoice) {
 					result: winner+" wins round "+parseInt(game.round)
 				})
 			})
-			$('#leftRound'+game.round).css('display', 'block') 
-			$('#leftRound'+game.round).html(loser+" chose "+leftChoice)
-			$('#rightRound'+game.round).css('display', 'block')
-			$('#rightRound'+game.round).html(winner+" chose "+rightChoice)
+			$('#leftRound'+parseInt(game.round)).css('display', 'block') 
+			$('#leftRound'+parseInt(game.round)).html(loser+" chose "+leftChoice)
+			$('#rightRound'+parseInt(game.round)).css('display', 'block')
+			$('#rightRound'+parseInt(game.round)).html(winner+" chose "+rightChoice)
 			db.ref('/result').once('value', function(snapshot) {
 				$('#resultRound'+parseInt(game.round)).html(snapshot.val())
 			})
+			if (game.playerID === 2) {
+				game.wins++
+				$("#rightWins").html(game.wins)
+			} else {
+				game.oppWins++
+				$("#rightWins").html(game.oppWins)
+			}
 		})
 	} else if (dif === 2) {
 		db.ref('/users').once('value', function(snapshot) {
@@ -184,17 +200,47 @@ var compare = function(leftChoice, rightChoice) {
 					result: winner+" wins round "+parseInt(game.round)
 				})
 			})
+			$('#leftRound'+parseInt(game.round)).css('display', 'block') 
+			$('#leftRound'+parseInt(game.round)).html(loser+" chose "+leftChoice)
+			$('#rightRound'+parseInt(game.round)).css('display', 'block')
+			$('#rightRound'+parseInt(game.round)).html(winner+" chose "+rightChoice)
+			db.ref('/result').once('value', function(snapshot) {
+				$('#resultRound'+parseInt(game.round)).html(snapshot.val())
+			})
+			if (game.playerID === 2) {
+				game.wins++
+				$("#rightWins").html(game.wins)
+			} else {
+				game.oppWins++
+				$("#rightWins").html(game.oppWins)
+			}
 		})
 	} else if (dif === -2) {
 		db.ref('/users').once('value', function(snapshot) {
 			$.each(snapshot.val(), function(key, value) {
 				if (value.order === -1) {
 					winner = value.name
+				} else if (value.order === 0) {
+					loser = value.name
 				}
 				db.ref().update({
-					result: winner+"wins round "+parseInt(game.round)
+					result: winner+" wins round "+parseInt(game.round)
 				})
 			})
+			$('#leftRound'+parseInt(game.round)).css('display', 'block') 
+			$('#leftRound'+parseInt(game.round)).html(winner+" chose "+leftChoice)
+			$('#rightRound'+parseInt(game.round)).css('display', 'block')
+			$('#rightRound'+parseInt(game.round)).html(loser+" chose "+rightChoice)
+			db.ref('/result').once('value', function(snapshot) {
+				$('#resultRound'+parseInt(game.round)).html(snapshot.val())
+			})
+			if (game.playerID === 1) {
+				game.wins++
+				$("#leftWins").html(game.wins)
+			} else {
+				game.oppWins++
+				$("#leftWins").html(game.oppWins)
+			}
 		})
 	}
 	setTimeout(function() {
@@ -203,7 +249,31 @@ var compare = function(leftChoice, rightChoice) {
 		rightChoice: "null"
 	})
 	}, 200)
-	game.round += .5
+	setTimeout(function() {
+		var newRoundResult = $('<div>')
+		newRoundResult.attr('id', 'resultRound' + (parseInt(game.round)))
+		var newLeft = $('<div>')
+		newLeft.attr('id', 'leftRound' + (parseInt(game.round)))
+		var newRight = $('<div>')
+		newRight.attr('id', 'rightRound' + (parseInt(game.round)))
+		if (game.playerID === 1) {
+			newLeft.html('Waiting for '+game.userName+'...')
+			newRight.html('Waiting for '+game.opponent+'...')
+		} else {
+			newLeft.html('Waiting for '+game.opponent+'...')
+			newRight.html('Waiting for '+game.userName+'...')
+		}
+		var newRoundTitle = $('<div>')
+		newRoundTitle.attr('id', 'round'+(parseInt(game.round))+'Title')
+		newRoundTitle.html("Round " + (parseInt(game.round)) + ":")
+		$('#gameCommentary').prepend('</br></br></br>')
+		$('#gameCommentary').prepend(newRoundResult)
+		$('#gameCommentary').prepend(newRight)
+		$('#gameCommentary').prepend(newLeft)
+		$('#gameCommentary').prepend(newRoundTitle)
+
+	}, 2000)
+	setTimeout(function() {game.round += 1}, 1000)
 	game.ready = 0
 }
 
